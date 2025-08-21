@@ -1,0 +1,259 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Self-Help App Design System - Calm & Wellness Focused */
+
+@layer base {
+  :root {
+    /* Modern Vibrant Palette */
+    --background: 210 40% 98%;
+    --foreground: 210 15% 20%;
+
+    /* Primary - Electric Blue */
+    --primary: 215 85% 60%;
+    --primary-light: 215 90% 70%;
+    --primary-dark: 215 80% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Deep Purple */
+    --secondary: 270 60% 50%;
+    --secondary-light: 270 65% 60%;
+    --secondary-dark: 270 55% 40%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Accent - Vibrant Coral */
+    --accent: 15 85% 65%;
+    --accent-light: 15 90% 75%;
+    --accent-dark: 15 80% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Neutrals */
+    --muted: 210 25% 95%;
+    --muted-foreground: 210 10% 45%;
+    --border: 210 30% 90%;
+    --input: 210 35% 96%;
+    --ring: 215 85% 60%;
+
+    /* Status Colors */
+    --success: 145 60% 50%;
+    --warning: 35 85% 60%;
+    --destructive: 0 75% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Card & Surface */
+    --card: 0 0% 100%;
+    --card-foreground: 210 15% 20%;
+    --surface: 210 40% 98%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(215 85% 60%) 0%, hsl(215 90% 70%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(270 60% 50%) 0%, hsl(270 65% 60%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(15 85% 65%) 0%, hsl(15 90% 75%) 100%);
+    --gradient-calm: linear-gradient(135deg, hsl(215 85% 60%) 0%, hsl(270 60% 50%) 100%);
+    --gradient-surface: linear-gradient(135deg, hsl(210 40% 98%) 0%, hsl(210 35% 96%) 100%);
+
+    /* Shadows */
+    --shadow-soft: 0 4px 24px -8px hsl(220 20% 30% / 0.15);
+    --shadow-medium: 0 8px 32px -12px hsl(220 20% 30% / 0.2);
+    --shadow-strong: 0 16px 48px -16px hsl(220 20% 30% / 0.25);
+    --shadow-glow: 0 0 24px hsl(var(--primary) / 0.3);
+
+    /* Spacing & Layout */
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    --background: 210 25% 8%;
+    --foreground: 210 15% 85%;
+    --card: 210 25% 12%;
+    --card-foreground: 210 15% 85%;
+    --surface: 210 25% 10%;
+    --muted: 210 20% 15%;
+    --muted-foreground: 210 10% 60%;
+    --border: 210 25% 18%;
+    --input: 210 25% 16%;
+    --gradient-surface: linear-gradient(135deg, hsl(210 25% 12%) 0%, hsl(210 25% 8%) 100%);
+    --shadow-soft: 0 4px 24px -8px hsl(0 0% 0% / 0.3);
+    --shadow-medium: 0 8px 32px -12px hsl(0 0% 0% / 0.4);
+    --shadow-strong: 0 16px 48px -16px hsl(0 0% 0% / 0.5);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    background: var(--gradient-surface);
+  }
+}
+
+@layer components {
+  /* Button Variants */
+  .btn-primary {
+    @apply bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium;
+    background: var(--gradient-primary);
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition-normal);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground px-6 py-3 rounded-lg font-medium;
+    background: var(--gradient-secondary);
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition-normal);
+  }
+
+  .btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-foreground px-6 py-3 rounded-lg font-medium border border-border;
+    transition: var(--transition-normal);
+  }
+
+  .btn-ghost:hover {
+    @apply bg-muted;
+  }
+
+  /* Input Styles */
+  .input-primary {
+    @apply w-full px-4 py-3 rounded-lg border border-border bg-input text-foreground;
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition-normal);
+  }
+
+  .input-primary:focus {
+    @apply outline-none ring-2 ring-primary/20;
+    box-shadow: var(--shadow-glow);
+  }
+
+  /* Card Styles */
+  .card {
+    @apply bg-card rounded-xl border border-border;
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition-normal);
+  }
+
+  .card:hover {
+    box-shadow: var(--shadow-medium);
+  }
+
+  /* Floating Action Button */
+  .fab {
+    @apply fixed bottom-6 right-6 w-16 h-16 rounded-full flex items-center justify-center text-white z-50;
+    background: var(--gradient-primary);
+    box-shadow: var(--shadow-strong);
+    transition: var(--transition-normal);
+  }
+
+  .fab:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-glow);
+  }
+
+  /* Tab Styles */
+  .tab-button {
+    @apply px-6 py-3 rounded-lg font-medium transition-all;
+    transition: var(--transition-fast);
+  }
+
+  .tab-button.active {
+    @apply text-primary-foreground;
+    background: var(--gradient-primary);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .tab-button:not(.active) {
+    @apply text-muted-foreground hover:text-foreground hover:bg-muted;
+  }
+
+  /* Animation Classes */
+  .animate-fade-in {
+    animation: fadeIn var(--transition-normal) ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp var(--transition-normal) ease-out;
+  }
+
+  .animate-bounce-soft {
+    animation: bounceSoft var(--transition-slow) ease-out;
+  }
+}
+
+@layer utilities {
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-secondary {
+    background: var(--gradient-secondary);
+  }
+
+  .gradient-accent {
+    background: var(--gradient-accent);
+  }
+
+  .gradient-calm {
+    background: var(--gradient-calm);
+  }
+
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shadow-medium {
+    box-shadow: var(--shadow-medium);
+  }
+
+  .shadow-strong {
+    box-shadow: var(--shadow-strong);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounceSoft {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
