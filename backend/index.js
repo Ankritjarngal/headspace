@@ -18,7 +18,7 @@ app.post('/api/summarize', async (req, res) => {
     return res.status(400).json({ error: 'Mood scale is required.' });
   }
 
-  const prompt = `Act as a helpful journal summarizer. The user has described their mood as ${moodScale} today. Read the following journal entry and provide a concise, factual summary. Focus on key events, people, emotions, and decisions mentioned in the text, reflecting the user's indicated mood. The summary should be easy to read and under 150 words.
+  const prompt = `Act as a helpful journal summarizer. The user has described their mood as ${moodScale} today. Read the following journal entry and provide a concise, factual summary to be displayed to the user. Focus on key events, people, emotions, and decisions mentioned in the text, reflecting the user's indicated mood. The summary should be easy to read and under 150 words.
 
 Journal Entry:
 ${journalText}
