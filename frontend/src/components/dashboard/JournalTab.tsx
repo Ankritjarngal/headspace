@@ -45,7 +45,7 @@ const JournalTab: React.FC = () => {
   // Generate summary from backend
   const generateSummary = async (journalContent: string, moodValue: string): Promise<string> => {
     try {
-      const response = await fetch('http://localhost:3001/api/summarize', {
+      const response = await fetch('https://headspace-backend.onrender.com/api/summarize', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -343,7 +343,7 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ companionName }) => {
 
       console.log('FloatingChatbot: Request payload:', requestPayload);
 
-      const response = await fetch('http://localhost:3001/api/conversation', {
+      const response = await fetch('https://headspace-backend.onrender.com/api/conversation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
