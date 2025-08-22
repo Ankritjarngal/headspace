@@ -9,24 +9,24 @@ app.use(cors());
 app.use(express.json());
 
 const companionPromptsMap = {
-  aura: "You are Aura, a calm and gentle companion. Your purpose is to provide serene, encouraging, and soothing support. Respond with a soft, comforting tone. Focus on bringing peace and clarity to the user's thoughts and feelings.",
-  zenith: "You are Zenith, a mindful guide. Your purpose is to help the user stay present and grounded. Respond by encouraging awareness of thoughts and feelings without judgment. Use language that promotes focus on the here and now.",
-  summit: "You are Summit, a proactive motivator. Your purpose is to help the user achieve their goals and take action. Respond with an energetic and encouraging tone. Break down problems into actionable steps and inspire progress.",
-  luna: "You are Luna, an empathetic companion. Your purpose is to provide emotional support and understanding. Respond with a warm, compassionate tone. Validate the user's feelings and help them feel heard and connected.",
-  sage: "You are Sage, a wise and introspective guide. Your purpose is to encourage deep thought and personal insight. Respond with a thoughtful and philosophical tone. Ask insightful questions to help the user explore the deeper meaning of their experiences."
+  'aura': "You are Aura, a calm and gentle companion. Your purpose is to provide serene, encouraging, and soothing support. Respond with a soft, comforting tone. Focus on bringing peace and clarity to the user's thoughts and feelings.",
+  'zenith': "You are Zenith, a mindful guide. Your purpose is to help the user stay present and grounded. Respond by encouraging awareness of thoughts and feelings without judgment. Use language that promotes focus on the here and now.",
+  'summit': "You are Summit, a proactive motivator. Your purpose is to help the user achieve their goals and take action. Respond with an energetic and encouraging tone. Break down problems into actionable steps and inspire progress.",
+  'luna': "You are Luna, an empathetic companion. Your purpose is to provide emotional support and understanding. Respond with a warm, compassionate tone. Validate the user's feelings and help them feel heard and connected.",
+  'sage': "You are Sage, a wise and introspective guide. Your purpose is to encourage deep thought and personal insight. Respond with a thoughtful and philosophical tone. Ask insightful questions to help the user explore the deeper meaning of their experiences."
 };
-
-app.get("/health", (req, res) => {
-  res.status(200).json({ status: 'ok' });
-});
 
 app.post('/api/summarize', async (req, res) => {
   const { journalText, moodScale } = req.body;
 
-  if (!journalText) return res.status(400).json({ error: 'Journal text is required.' });
-  if (!moodScale) return res.status(400).json({ error: 'Mood scale is required.' });
+  if (!journalText) {
+    return res.status(400).json({ error: 'Journal text is required.' });
+  }
+  if (!moodScale) {
+    return res.status(400).json({ error: 'Mood scale is required.' });
+  }
 
-  const prompt = `Act as a helpful journal summarizer. The user has described their mood as ${moodScale} today. Read the following journal entry and provide a concise, factual summary under 150 words.
+  const prompt = `Act as a helpful journal summarizer. The user has described their mood as ${moodScale} today. Read the following journal entry and provide a concise, factual summary to be displayed to the user. Focus on key events, people, emotions, and decisions mentioned in the text, reflecting the user's indicated mood. The summary should be easy to read and under 150 words.
 
 Journal Entry:
 ${journalText}
@@ -34,129 +34,17 @@ ${journalText}
 Summary:`;
 
   const payload = {
-    contents: [{ role: "user", parts: [{ text: prompt }] }],
-    generationConfig: { responseMimeType: "text/plain" }
-  };
-
-  const apiKey = process.env.GEMINI_API_KEY;
-  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-  try {
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    if (!response.ok) throw new Error(`API call failed: ${response.status}`);
-    const result = await response.json();
-
-    const summaryText = result?.candidates?.[0]?.content?.parts?.[0]?.text || "No summary generated.";
-    res.status(200).json({ summary: summaryText });
-  } catch (err) {
-    console.error("Summarize error:", err.message);
-    res.status(500).json({ summary: "I couldn't generate a summary right now. Please try again later." });
-  }
-});
-
-app.post('/api/conversation', async (req, res) => {
-  const {
-    summaries = [],
-    userPersonaText = "",
-    chatbotPersonaId = "aura",
-    questions = [],
-    conversationHistory = [],
-    currentTasks = [],
-  } = req.body;
-
-  const activeTasks = currentTasks.filter(t => !t.completed);
-  const completedTasks = currentTasks.filter(t => t.completed);
-
-  const tasksContext = `
-Current Active Tasks (${activeTasks.length}):
-${activeTasks.length ? activeTasks.map(t => `- ${t.text}`).join('\n') : "None"}
-
-Recently Completed Tasks (${completedTasks.slice(-3).length}):
-${completedTasks.slice(-3).map(t => `- ${t.text}`).join('\n') || "None"}
-`;
-
-  const context = `
-${companionPromptsMap[chatbotPersonaId]}
-
-Journal entry summaries:
-${summaries.join('\n')}
-
-User Persona: ${userPersonaText}
-
-${tasksContext}
-
-Conversation History:
-${conversationHistory.map(e => `${e.role}: ${e.text}`).join('\n')}
-`;
-
-  // Improved prompt for natural conversation and intelligent task management
-  const prompt = `You are a helpful conversational assistant. Respond like a real human friend would - keep it SHORT (1-2 sentences max), natural, and conversational. Don't be verbose or overly enthusiastic.
-
-TASK MANAGEMENT - Be smart and contextual:
-- Add tasks ONLY when the conversation naturally suggests the user needs help with something specific
-- Remove tasks when user completes them or they're no longer relevant
-- Don't force tasks - only suggest when genuinely helpful based on what user is saying
-- Max 2 new tasks per response, max 5 total active tasks
-
-RESPONSE STYLE:
-- Short and natural (like texting a friend)
-- Don't over-explain or be wordy
-- Be supportive but not overly cheerful
-- Match the user's tone and energy level
-
-RESPONSE FORMAT (valid JSON only):
-{
-  "response": "Short, natural response (1-2 sentences max)",
-  "taskUpdates": {
-    "newTasks": [{"text": "specific actionable task", "reason": "why it's helpful now"}],
-    "removeTasks": [{"id": "task_id", "reason": "why removing"}]
-  }
-}
-
-Context:
-${context}
-
-User: ${questions[questions.length - 1]}
-
-JSON response:`;
-
-  const payload = {
-    contents: [{ role: "user", parts: [{ text: prompt }] }],
-    generationConfig: {
-      responseMimeType: "application/json",
-      temperature: 0.8,
-      maxOutputTokens: 8192, // Much higher limit - can go up to 65,536 if needed
-    },
-    safetySettings: [
-      {
-        category: "HARM_CATEGORY_HARASSMENT",
-        threshold: "BLOCK_NONE"
-      },
-      {
-        category: "HARM_CATEGORY_HATE_SPEECH", 
-        threshold: "BLOCK_NONE"
-      },
-      {
-        category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        threshold: "BLOCK_NONE"
-      },
-      {
-        category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-        threshold: "BLOCK_NONE"
-      }
-    ]
+    contents: [{
+      role: "user",
+      parts: [{ text: prompt }]
+    }]
   };
 
   const apiKey = process.env.GEMINI_API_KEY;
   const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
   let retryCount = 0;
-  const maxRetries = 3;
+  const maxRetries = 5;
 
   const fetchData = async () => {
     try {
@@ -167,120 +55,236 @@ JSON response:`;
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`API call failed: ${response.status} - ${errorText}`);
-        throw new Error(`API call failed: ${response.status}`);
+        throw new Error(`API call failed with status: ${response.status}`);
       }
-      
+
       const result = await response.json();
-      console.log("Full API Response:", JSON.stringify(result, null, 2));
-
-      let conversationResponse = result?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-      
-      // Check if we got an empty response or hit token limits
-      if (!conversationResponse || conversationResponse.trim() === "" || result?.candidates?.[0]?.finishReason === "MAX_TOKENS") {
-        console.warn("Empty response or token limit hit. Full result:", result);
-        
-        // If hit token limit, provide a simple fallback
-        if (result?.candidates?.[0]?.finishReason === "MAX_TOKENS") {
-          console.warn("Token limit exceeded - using fallback response");
-          const fallbackResponse = {
-            response: "I'm here with you! How can I help?",
-            taskUpdates: { newTasks: [], removeTasks: [] }
-          };
-          return res.status(200).json(fallbackResponse);
-        }
-        
-        throw new Error("Empty response from API");
+      if (result.candidates && result.candidates.length > 0 &&
+        result.candidates[0].content && result.candidates[0].content.parts &&
+        result.candidates[0].content.parts.length > 0) {
+        const summaryText = result.candidates[0].content.parts[0].text;
+        res.status(200).json({ summary: summaryText });
+      } else {
+        res.status(500).json({ error: 'Failed to get summary from API.' });
       }
-      
-      // Log the raw response for debugging
-      console.log("Raw AI Response:", conversationResponse);
-      
-      // Clean the response - remove potential markdown code blocks or extra whitespace
-      conversationResponse = conversationResponse.trim();
-      if (conversationResponse.startsWith('```json')) {
-        conversationResponse = conversationResponse.replace(/^```json\s*/, '').replace(/\s*```$/, '');
-      } else if (conversationResponse.startsWith('```')) {
-        conversationResponse = conversationResponse.replace(/^```\s*/, '').replace(/\s*```$/, '');
-      }
-      
-      console.log("Cleaned Response:", conversationResponse);
-
-      // Parse safely with better error handling
-      let parsedResponse;
-      try {
-        parsedResponse = JSON.parse(conversationResponse);
-        console.log("Successfully parsed JSON:", parsedResponse);
-      } catch (parseError) {
-        console.warn("JSON Parse Error:", parseError.message);
-        console.warn("Failed to parse:", conversationResponse);
-        console.warn("Response length:", conversationResponse.length);
-        
-        // If completely empty response, throw error to trigger retry
-        if (!conversationResponse || conversationResponse.trim() === "") {
-          throw new Error("Empty response from AI");
-        }
-        
-        // Try to extract just the response text if JSON parsing fails
-        let responseText = "I'm here with you.";
-        
-        // Simple regex to try to extract response content
-        const responseMatch = conversationResponse.match(/"response"\s*:\s*"([^"]+)"/);
-        if (responseMatch) {
-          responseText = responseMatch[1];
-        }
-        
-        parsedResponse = {
-          response: responseText,
-          taskUpdates: { newTasks: [], removeTasks: [] }
-        };
-      }
-
-      // Always ensure correct structure
-      parsedResponse.taskUpdates = parsedResponse.taskUpdates || {};
-      parsedResponse.taskUpdates.newTasks = parsedResponse.taskUpdates.newTasks || [];
-      parsedResponse.taskUpdates.removeTasks = parsedResponse.taskUpdates.removeTasks || [];
-
-      // Enforce max 2 new tasks
-      if (parsedResponse.taskUpdates.newTasks.length > 2) {
-        parsedResponse.taskUpdates.newTasks = parsedResponse.taskUpdates.newTasks.slice(0, 2);
-      }
-
-      // Enforce max 5 total tasks
-      const projectedTotal = activeTasks.length - parsedResponse.taskUpdates.removeTasks.length + parsedResponse.taskUpdates.newTasks.length;
-      if (projectedTotal > 5) {
-        const excess = projectedTotal - 5;
-        const oldest = activeTasks.slice(0, excess);
-        oldest.forEach(task => {
-          parsedResponse.taskUpdates.removeTasks.push({
-            id: task.id,
-            reason: "Removed automatically to maintain task limit"
-          });
-        });
-      }
-
-      res.status(200).json(parsedResponse);
     } catch (err) {
-      console.error("Full error details:", err);
       if (retryCount < maxRetries) {
         retryCount++;
         const delay = Math.pow(2, retryCount) * 1000;
-        console.warn(`Retry ${retryCount}/${maxRetries} in ${delay / 1000}s... (${err.message})`);
+        console.warn(`API call failed. Retrying in ${delay / 1000}s...`);
         setTimeout(fetchData, delay);
-        return;
+      } else {
+        console.error('An error occurred after multiple retries:', err.message);
+        res.status(500).json({ error: 'An internal server error occurred after multiple retries.' });
       }
-      console.error("Max retries reached. Conversation error:", err.message);
-      res.status(500).json({
-        response: "I'm having trouble connecting right now. Please try again in a moment.",
-        taskUpdates: { newTasks: [], removeTasks: [] }
-      });
     }
   };
 
   fetchData();
 });
 
+
+
+
+app.post('/api/conversation', async (req, res) => {
+    const {
+      summaries,
+      userPersonaText,
+      chatbotPersonaId,
+      questions,
+      conversationHistory,
+      currentTasks = [],
+    } = req.body;
+
+    const activeTasks = currentTasks.filter(task => !task.completed);
+    const completedTasks = currentTasks.filter(task => task.completed);
+    
+    const tasksContext = `
+      Current Active Tasks (${activeTasks.length}):
+      ${activeTasks.length > 0 ? activeTasks.map(task => `- ${task.text}`).join('\n') : 'None'}
+      
+      Recently Completed Tasks (${completedTasks.slice(-3).length}):
+      ${completedTasks.slice(-3).length > 0 ? completedTasks.slice(-3).map(task => `- ${task.text}`).join('\n') : 'None'}
+    `;
+
+    // Combine summaries and conversation history into a single, cohesive context.
+    const context = `
+      ${companionPromptsMap[chatbotPersonaId]}
+      
+      Journal entry summaries:
+      ${summaries.join('\n')}
+
+      User Persona: ${userPersonaText}
+      
+      ${tasksContext}
+      
+      Conversation History:
+      ${conversationHistory.map(entry => `${entry.role}: ${entry.text}`).join('\n')}
+    `;
+    const prompt = `You are a helpful, human, and compassionate conversational assistant. You are an expert in heart-to-heart conversations and talk like a human. Your goal is to engage in a meaningful dialogue with the user based on their journal entries and help them with actionable tasks when relevant.
+
+  IMPORTANT TASK MANAGEMENT INSTRUCTIONS:
+  1. Based on the conversation and user's needs, you may suggest relevant tasks
+  2. Only suggest tasks that are directly related to the current conversation or user's expressed needs
+  3. Keep the active task list to a maximum of 5 tasks
+  4. If suggesting new tasks would exceed 5 total tasks, identify 1-2 tasks from the current list that seem less relevant or completed and mark them for removal
+  5. Suggest a maximum of 1-2 new tasks per conversation to avoid overwhelming the user
+  6. Tasks should be actionable, specific, and achievable
+  7. Avoid duplicating existing active tasks
+
+  Your response should be in the following JSON format:
+  {
+    "response": "Your conversational response here",
+    "taskUpdates": {
+      "newTasks": [
+        {
+          "text": "Specific actionable task",
+          "reason": "Brief explanation of why this task is relevant"
+        }
+      ],
+      "removeTasks": [
+        {
+          "id": "task_id_to_remove",
+          "reason": "Why this task should be removed (completed, no longer relevant, etc.)"
+        }
+      ]
+    }
+  }
+
+  If no task updates are needed, set "newTasks" and "removeTasks" to empty arrays.
+
+  Context:
+  ${context}
+
+  User's current question: ${questions[questions.length - 1]}
+
+  Respond as JSON:`;
+
+    console.log('Enhanced prompt with task management:', prompt);
+
+    const payload = {
+      contents: [{
+        role: "user",
+        parts: [{ text: prompt }]
+      }],
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 1000,
+      }
+    };
+
+  const apiKey = process.env.GEMINI_API_KEY;
+  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+  let retryCount = 0;
+  const maxRetries = 5;
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`API call failed with status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.candidates && result.candidates.length > 0 &&
+        result.candidates[0].content && result.candidates[0].content.parts &&
+        result.candidates[0].content.parts.length > 0) {
+        
+        let conversationResponse = result.candidates[0].content.parts[0].text;
+        
+        // Clean up the response (remove code block markers if present)
+        conversationResponse = conversationResponse.replace(/```json\s*/, '').replace(/```\s*$/, '');
+        
+        try {
+          // Try to parse as JSON
+          const parsedResponse = JSON.parse(conversationResponse);
+          
+          // Validate the response structure
+          if (parsedResponse.response && parsedResponse.taskUpdates) {
+            // Ensure arrays exist
+            parsedResponse.taskUpdates.newTasks = parsedResponse.taskUpdates.newTasks || [];
+            parsedResponse.taskUpdates.removeTasks = parsedResponse.taskUpdates.removeTasks || [];
+            
+            // Limit new tasks to maximum of 2
+            if (parsedResponse.taskUpdates.newTasks.length > 2) {
+              parsedResponse.taskUpdates.newTasks = parsedResponse.taskUpdates.newTasks.slice(0, 2);
+            }
+            
+            // Validate that total active tasks won't exceed 5
+            const currentActiveCount = activeTasks.length;
+            const tasksToRemove = parsedResponse.taskUpdates.removeTasks.length;
+            const tasksToAdd = parsedResponse.taskUpdates.newTasks.length;
+            const projectedTotal = currentActiveCount - tasksToRemove + tasksToAdd;
+            
+            // If projected total exceeds 5, automatically remove oldest tasks
+            if (projectedTotal > 5) {
+              const excessTasks = projectedTotal - 5;
+              const oldestTasks = activeTasks
+                .filter(task => !parsedResponse.taskUpdates.removeTasks.some(rt => rt.id === task.id))
+                .slice(0, excessTasks);
+              
+              oldestTasks.forEach(task => {
+                parsedResponse.taskUpdates.removeTasks.push({
+                  id: task.id,
+                  reason: "Automatically removed to maintain task limit of 5"
+                });
+              });
+            }
+            
+            console.log('Task updates:', parsedResponse.taskUpdates);
+            res.status(200).json(parsedResponse);
+          } else {
+            throw new Error('Invalid response structure from AI');
+          }
+          
+        } catch (parseError) {
+          console.warn('Failed to parse AI response as JSON, treating as plain text:', parseError.message);
+          
+          // Fallback: return plain response without task updates
+          res.status(200).json({ 
+            response: conversationResponse,
+            taskUpdates: {
+              newTasks: [],
+              removeTasks: []
+            }
+          });
+        }
+        
+      } else {
+        res.status(500).json({ error: 'Failed to get a conversation response from the API.' });
+      }
+      
+    } catch (err) {
+      if (retryCount < maxRetries) {
+        retryCount++;
+        const delay = Math.pow(2, retryCount) * 1000;
+        console.warn(`API call failed. Retrying in ${delay / 1000}s...`);
+        setTimeout(fetchData, delay);
+      } else {
+        console.error('An error occurred after multiple retries:', err.message);
+        res.status(500).json({ 
+          error: 'An internal server error occurred after multiple retries.',
+          response: 'I apologize, but I\'m having trouble connecting right now. Please try again in a moment.',
+          taskUpdates: {
+            newTasks: [],
+            removeTasks: []
+          }
+        });
+      }
+    }
+  };
+
+  fetchData();
+});
+
+
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server is running at http://localhost:${port}`);
 });
