@@ -18,6 +18,7 @@ interface TaskUpdates {
 const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'journal' | 'chat'>('journal');
   const [isTodoCollapsed, setIsTodoCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const todoSidebarRef = useRef<any>(null);
 
@@ -32,6 +33,10 @@ const Dashboard: React.FC = () => {
 
   const toggleTodoSidebar = () => {
     setIsTodoCollapsed(!isTodoCollapsed);
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   const handleTaskUpdates = (updates: TaskUpdates) => {
@@ -84,48 +89,91 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Todo Sidebar */}
-      <TodoSidebar 
-        isCollapsed={isTodoCollapsed} 
-        onToggle={toggleTodoSidebar}
-      />
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Todo Sidebar - Responsive */}
+      <div className={`
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+        lg:translate-x-0 fixed left-0 top-0 h-full z-50 transition-transform duration-300 ease-out
+        lg:relative lg:z-auto
+      `}>
+        <TodoSidebar 
+          isCollapsed={isTodoCollapsed} 
+          onToggle={toggleTodoSidebar}
+        />
+      </div>
 
       {/* Main Content Area */}
-      <div className={`transition-all duration-300 ${isTodoCollapsed ? 'ml-16' : 'ml-80'}`}>
+      <div className={`
+        transition-all duration-300 min-h-screen
+        lg:ml-16 ${!isTodoCollapsed ? 'lg:ml-80' : ''}
+      `}>
         {/* Header */}
-        <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40">
-          <div className="container mx-auto px-6 py-4">
+        <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-30">
+          <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 gradient-calm rounded-full flex items-center justify-center">
-                  <span className="text-xl">{companion.icon}</span>
+              {/* Left side */}
+              <div className="flex items-center gap-2 sm:gap-4">
+                {/* Mobile menu button */}
+                <button
+                  onClick={toggleMobileMenu}
+                  className="lg:hidden p-2 -ml-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
+
+                <div className="w-8 h-8 sm:w-10 sm:h-10 gradient-calm rounded-full flex items-center justify-center">
+                  <span className="text-lg sm:text-xl">{companion.icon}</span>
                 </div>
-                <div>
-                  <h1 className="text-xl font-bold">MindSpace</h1>
-                  <p className="text-sm text-muted-foreground">{companion.greeting}</p>
+                <div className="min-w-0">
+                  <h1 className="text-lg sm:text-xl font-bold truncate">MindSpace</h1>
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate hidden sm:block">
+                    {companion.greeting}
+                  </p>
                 </div>
               </div>
               
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <p className="text-sm font-medium">{user?.name}</p>
-                  <p className="text-xs text-muted-foreground">with {companion.name}</p>
+              {/* Right side */}
+              <div className="flex items-center gap-2 sm:gap-4">
+                <div className="text-right hidden sm:block">
+                  <p className="text-sm font-medium truncate max-w-32">{user?.name}</p>
+                  <p className="text-xs text-muted-foreground truncate">with {companion.name}</p>
                 </div>
+                
+                {/* Mobile user info */}
+                <div className="sm:hidden">
+                  <p className="text-sm font-medium">{user?.name?.split(' ')[0]}</p>
+                </div>
+
                 <button 
                   onClick={logout}
-                  className="btn-ghost !px-4 !py-2 text-sm"
+                  className="btn-ghost !px-2 sm:!px-4 !py-2 text-xs sm:text-sm"
                 >
-                  Logout
+                  <span className="hidden sm:inline">Logout</span>
+                  <svg className="w-4 h-4 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
                 </button>
               </div>
+            </div>
+
+            {/* Mobile greeting */}
+            <div className="sm:hidden mt-2">
+              <p className="text-xs text-muted-foreground">{companion.greeting}</p>
             </div>
           </div>
         </header>
 
-        {/* Tab Navigation */}
-       
         {/* Main Content */}
-        <main className="container mx-auto px-6 py-8">
+        <main className="container mx-auto px-4 sm:px-6 py-4 sm:py-8">
           {activeTab === 'journal' && <JournalTab />}
         </main>
       </div>

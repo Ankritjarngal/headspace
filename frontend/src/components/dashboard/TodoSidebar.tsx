@@ -35,6 +35,7 @@ const TodoSidebar: React.FC<TodoSidebarProps> = ({ isCollapsed = false, onToggle
   const [newTask, setNewTask] = useState('');
   const [totalTasksCompleted, setTotalTasksCompleted] = useState(0);
   const [milestoneStates, setMilestoneStates] = useState<MilestoneState>({});
+  const [isMobile, setIsMobile] = useState(false);
   
   const baseMilestones = [
     {
@@ -73,6 +74,17 @@ const TodoSidebar: React.FC<TodoSidebarProps> = ({ isCollapsed = false, onToggle
       color: "bg-indigo-100 text-indigo-800 border-indigo-200"
     }
   ];
+
+  // Check for mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024); // Use lg breakpoint to match Dashboard
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Create milestones with persistent achievement state
   const milestones: Milestone[] = baseMilestones.map(milestone => ({
@@ -328,13 +340,18 @@ const TodoSidebar: React.FC<TodoSidebarProps> = ({ isCollapsed = false, onToggle
     : 100;
 
   return (
-    <div className={`fixed left-0 top-0 h-full bg-white/95 backdrop-blur-xl border-r border-gray-200 shadow-2xl transition-all duration-300 ease-out z-30 ${
-      isCollapsed ? 'w-16' : 'w-80'
-    }`}>
+    <div className={`
+      fixed left-0 top-0 h-full bg-white/95 backdrop-blur-xl border-r border-gray-200 shadow-2xl transition-all duration-300 ease-out
+      ${isMobile ? 'z-50' : 'z-30'}
+      ${isMobile 
+        ? (isCollapsed ? '-translate-x-full w-80' : 'translate-x-0 w-80')
+        : (isCollapsed ? 'w-16' : 'w-80')
+      }
+    `}>
       {/* Header */}
       <div className="p-4 border-b border-gray-200/50 bg-gradient-to-r from-blue-50/50 to-purple-50/50">
         <div className="flex items-center justify-between">
-          {!isCollapsed && (
+          {(!isCollapsed || isMobile) && (
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
                 <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -347,18 +364,25 @@ const TodoSidebar: React.FC<TodoSidebarProps> = ({ isCollapsed = false, onToggle
               </div>
             </div>
           )}
+          {/* Always show button, even when collapsed on mobile */}
           <button
             onClick={onToggle}
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
           >
-            <svg className={`w-4 h-4 transition-transform duration-200 ${isCollapsed ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            {isMobile ? (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className={`w-4 h-4 transition-transform duration-200 ${isCollapsed ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            )}
           </button>
         </div>
       </div>
 
-      {!isCollapsed && (
+      {(!isCollapsed || isMobile) && (
         <>
           {/* Progress Section */}
           <div className="p-4 border-b border-gray-200/50">
@@ -532,8 +556,8 @@ const TodoSidebar: React.FC<TodoSidebarProps> = ({ isCollapsed = false, onToggle
         </>
       )}
 
-      {/* Collapsed State */}
-      {isCollapsed && (
+      {/* Collapsed State - Desktop only */}
+      {!isMobile && isCollapsed && (
         <div className="p-4 flex flex-col items-center gap-4">
           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
             <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
