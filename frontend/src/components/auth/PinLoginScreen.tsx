@@ -52,17 +52,10 @@ const PinLoginScreen: React.FC<PinLoginScreenProps> = ({ onSuccess }) => {
             <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
               <Shield className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold mb-2 gradient-calm bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2 bg-clip-text ">
               Welcome Back
             </h1>
-            <p className="text-muted-foreground text-sm">
-              Enter your PIN to continue to your personal space
-            </p>
-            {user && (
-              <p className="text-sm text-muted-foreground mt-2">
-                Hello, {user.name}
-              </p>
-            )}
+            <h3 className="text-xl font-bold mb-2 bg-clip-text "> {user && ( user.name)}</h3>
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-6">

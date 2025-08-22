@@ -51,11 +51,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isNewUser, setIsNewUser] = useState<boolean>(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState<boolean>(false);
 
-  // Generate random name for user
+
   const generateRandomName = (): string => {
-    const adjectives = ['Peaceful', 'Bright', 'Creative', 'Gentle', 'Wise', 'Kind', 'Strong', 'Calm', 'Happy', 'Brave'];
-    const nouns = ['Explorer', 'Dreamer', 'Thinker', 'Seeker', 'Builder', 'Creator', 'Helper', 'Learner', 'Friend', 'Soul'];
-    const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+    const adjectives = [
+      'Peaceful', 'Radiant', 'Creative', 'Gentle', 'Wise', 'Kind', 'Strong', 'Calm', 'Happy', 'Brave',
+      'Mindful', 'Resilient', 'Joyful', 'Compassionate', 'Serene', 'Vibrant', 'Hopeful', 'Honest', 'Free',
+      'Patient', 'Dynamic', 'Empathetic', 'Courageous', 'Generous', 'Inspired', 'Evolving', 'Authentic',
+      'Grounded', 'Open-hearted', 'Thoughtful', 'Curious'
+    ];
+
+    const nouns = [
+      'Explorer', 'Dreamer', 'Thinker', 'Seeker', 'Builder', 'Creator', 'Helper', 'Learner', 'Friend', 'Soul',
+      'Guardian', 'Architect', 'Pioneer', 'Healer', 'Catalyst', 'Innovator', 'Stargazer', 'Journeyer',
+      'Listener', 'Nurturer', 'Voyager', 'Guide', 'Storyteller', 'Pathfinder', 'Visionary', 'Anchor',
+      'Light', 'Conqueror', 'Trailblazer', 'Sage', 'Harmonizer'
+    ];
+        const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
     const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
     return `${randomAdjective} ${randomNoun}`;
   };

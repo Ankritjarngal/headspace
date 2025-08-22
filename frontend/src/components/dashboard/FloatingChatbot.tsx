@@ -1,4 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+import {
+  X,
+  Maximize,
+  Trash2,
+  CheckCircle,
+  SendHorizonal,
+  Bot
+} from 'lucide-react';
 
 interface JournalEntry {
   id: string;
@@ -36,7 +44,6 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ companionName }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [message, setMessage] = useState('');
-  const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<ConversationMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
@@ -62,9 +69,7 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ companionName }) => {
     return (
       <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-xl">
         <div className="flex items-center gap-2 mb-2">
-          <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          <CheckCircle className="w-4 h-4 text-blue-600" />
           <span className="text-sm font-medium text-blue-800">Tasks Updated</span>
         </div>
         
@@ -395,25 +400,20 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ companionName }) => {
 
   const toggleFullScreen = () => {
     setIsFullScreen(!isFullScreen);
-    setIsMinimized(false);
-  };
-
-  const minimize = () => {
-    setIsMinimized(true);
-  };
-
-  const restore = () => {
-    setIsMinimized(false);
   };
 
   const close = () => {
     setIsOpen(false);
     setIsFullScreen(false);
-    setIsMinimized(false);
   };
 
   const clearConversation = () => {
-    if (window.confirm('Are you sure you want to clear the conversation history? This action cannot be undone.')) {
+    const customConfirm = (message: string) => {
+      const confirmed = window.confirm(message);
+      return confirmed;
+    };
+
+    if (customConfirm('Are you sure you want to clear the conversation history? This action cannot be undone.')) {
       setMessages([]);
       try {
         localStorage.removeItem(`conversationHistory_${companionName}`);
@@ -444,14 +444,10 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ companionName }) => {
       >
         <div className="relative">
           {isOpen ? (
-            <svg className="w-8 h-8 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X size={32} />
           ) : (
             <>
-              <svg className="w-8 h-8 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.959 8.959 0 01-2.4-.32l-5.6 2.72v-5.6a8 8 0 1116-5.28z" />
-              </svg>
+              <Bot size={32} />
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
                 <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
               </div>
@@ -470,9 +466,7 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ companionName }) => {
               <div className="bg-white/80 backdrop-blur-lg border-b border-gray-200/50 px-6 py-4 flex items-center justify-between shadow-sm">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-lg">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
+                    <Bot className="w-6 h-6 text-white" />
                   </div>
                   <div>
                     <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
@@ -487,33 +481,19 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ companionName }) => {
                     className="p-3 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-all duration-200"
                     title="Clear conversation history"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={minimize}
-                    className="p-3 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all duration-200"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                    </svg>
+                    <Trash2 className="w-5 h-5" />
                   </button>
                   <button
                     onClick={toggleFullScreen}
                     className="p-3 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all duration-200"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 9V4.5M9 9H4.5M9 9L3.5 3.5M15 9h4.5M15 9V4.5M15 9l5.5-5.5M9 15v4.5M9 15H4.5M9 15l-5.5 5.5M15 15h4.5M15 15v4.5m0 0l5.5 5.5" />
-                    </svg>
+                    <Maximize className="w-5 h-5" />
                   </button>
                   <button
                     onClick={close}
                     className="p-3 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all duration-200"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <X className="w-5 h-5" />
                   </button>
                 </div>
               </div>
@@ -545,9 +525,7 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ companionName }) => {
                     {messages.length === 0 ? (
                       <div className="text-center py-12">
                         <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-3xl flex items-center justify-center mx-auto mb-4">
-                          <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.959 8.959 0 01-2.4-.32l-5.6 2.72v-5.6a8 8 0 1116-5.28z" />
-                          </svg>
+                          <Bot className="w-10 h-10 text-blue-600" />
                         </div>
                         <h3 className="text-xl font-semibold text-gray-800 mb-2">Start a conversation</h3>
                         <p className="text-gray-600">Hi! I'm {companionName}, your AI companion. I'm here to chat about your thoughts, feelings, and journal entries. How can I help you today?</p>
@@ -627,9 +605,7 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ companionName }) => {
                           </>
                         ) : (
                           <>
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                            </svg>
+                            <SendHorizonal className="w-5 h-5" />
                             Send Message
                           </>
                         )}
@@ -650,11 +626,7 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ companionName }) => {
             </div>
           ) : (
             /* Floating Window Mode */
-            <div className={`fixed z-40 transition-all duration-300 ease-out ${
-              isMinimized 
-                ? 'bottom-24 right-6 w-80 h-16' 
-                : 'bottom-24 right-6 w-96 max-w-[calc(100vw-3rem)] h-[600px]'
-            }`}>
+            <div className="fixed z-40 transition-all duration-300 ease-out bottom-24 right-6 w-96 max-w-[calc(100vw-3rem)] h-[600px]">
               <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden h-full flex flex-col"
                    style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1)' }}>
                 
@@ -662,13 +634,11 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ companionName }) => {
                 <div className="p-4 border-b border-gray-200/50 flex items-center justify-between bg-gradient-to-r from-blue-50/50 to-purple-50/50">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-sm">
-                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
+                      <Bot className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-800">{isMinimized ? `Chat with ${companionName}` : 'Quick Chat'}</h3>
-                      {!isMinimized && <p className="text-sm text-gray-500">with {companionName} • {journalEntries.length} entries</p>}
+                      <h3 className="font-semibold text-gray-800">Quick Chat</h3>
+                      <p className="text-sm text-gray-500">with {companionName} • {journalEntries.length} entries</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
@@ -677,190 +647,156 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ companionName }) => {
                       className="p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-all duration-200"
                       title="Clear conversation history"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={minimize}
-                      className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all duration-200"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                      </svg>
+                      <Trash2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={toggleFullScreen}
                       className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all duration-200"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                      </svg>
+                      <Maximize className="w-4 h-4" />
                     </button>
                     <button
                       onClick={close}
                       className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all duration-200"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
+                      <X className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
 
-                {/* Content - Only show when not minimized */}
-                {!isMinimized && (
-                  <>
-                    {/* Messages Area */}
-                    <div className="flex-1 overflow-y-auto px-4 py-2">
-                      {messages.length === 0 ? (
-                        <div className="text-center py-8">
-                          <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.959 8.959 0 01-2.4-.32l-5.6 2.72v-5.6a8 8 0 1116-5.28z" />
-                            </svg>
-                          </div>
-                          <h4 className="font-semibold text-gray-800 mb-1">Chat with {companionName}</h4>
-                          <p className="text-sm text-gray-600">I'm here to help with your thoughts and feelings</p>
-                          {journalEntries.length > 0 && (
-                            <p className="text-xs text-gray-500 mt-1">{journalEntries.length} journal entries available</p>
-                          )}
+                {/* Content */}
+                <>
+                  {/* Messages Area */}
+                  <div className="flex-1 overflow-y-auto px-4 py-2">
+                    {messages.length === 0 ? (
+                      <div className="text-center py-8">
+                        <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                          <Bot className="w-6 h-6 text-blue-600" />
                         </div>
-                      ) : (
-                        <div className="space-y-3">
-                          {messages.map((msg) => (
-                            <div
-                              key={msg.id}
-                              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                            >
-                              <div className={`max-w-[85%] rounded-xl px-3 py-2 text-sm ${
-                                msg.role === 'user'
-                                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
-                                  : 'bg-white/80 text-gray-800 border border-gray-200'
+                        <h4 className="font-semibold text-gray-800 mb-1">Chat with {companionName}</h4>
+                        <p className="text-sm text-gray-600">I'm here to help with your thoughts and feelings</p>
+                        {journalEntries.length > 0 && (
+                          <p className="text-xs text-gray-500 mt-1">{journalEntries.length} journal entries available</p>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {messages.map((msg) => (
+                          <div
+                            key={msg.id}
+                            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                          >
+                            <div className={`max-w-[85%] rounded-xl px-3 py-2 text-sm ${
+                              msg.role === 'user'
+                                ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
+                                : 'bg-white/80 text-gray-800 border border-gray-200'
+                            }`}>
+                              <p className="leading-relaxed">{msg.text}</p>
+                              {msg.taskUpdates && <TaskUpdateIndicator taskUpdates={msg.taskUpdates} />}
+                              <p className={`text-xs mt-1 ${
+                                msg.role === 'user' ? 'text-blue-100' : 'text-gray-500'
                               }`}>
-                                <p className="leading-relaxed">{msg.text}</p>
-                                {msg.taskUpdates && <TaskUpdateIndicator taskUpdates={msg.taskUpdates} />}
-                                <p className={`text-xs mt-1 ${
-                                  msg.role === 'user' ? 'text-blue-100' : 'text-gray-500'
-                                }`}>
-                                  {formatTime(msg.timestamp)}
-                                </p>
-                              </div>
+                                {formatTime(msg.timestamp)}
+                              </p>
                             </div>
-                          ))}
-                          {isLoading && (
-                            <div className="flex justify-start">
-                              <div className="bg-white/80 rounded-xl px-3 py-2 border border-gray-200">
-                                <div className="flex items-center gap-2">
-                                  <div className="flex gap-1">
-                                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                                  </div>
-                                  <span className="text-xs text-gray-500">Thinking...</span>
+                          </div>
+                        ))}
+                        {isLoading && (
+                          <div className="flex justify-start">
+                            <div className="bg-white/80 rounded-xl px-3 py-2 border border-gray-200">
+                              <div className="flex items-center gap-2">
+                                <div className="flex gap-1">
+                                  <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                                  <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                                  <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                                 </div>
+                                <span className="text-xs text-gray-500">Thinking...</span>
                               </div>
                             </div>
-                          )}
-                          <div ref={messagesEndRef} />
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Quick Prompts */}
-                    {messages.length === 0 && (
-                      <div className="p-4 flex-shrink-0 border-t border-gray-200/50">
-                        <p className="text-sm font-medium text-gray-600 mb-3">Quick prompts:</p>
-                        <div className="space-y-2">
-                          {quickPrompts.map((prompt, index) => (
-                            <button
-                              key={index}
-                              onClick={() => handleQuickPrompt(prompt.text)}
-                              className="w-full text-left text-sm px-3 py-2 rounded-xl bg-gray-50/80 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 flex items-center gap-2 hover:scale-105"
-                            >
-                              <span>{prompt.icon}</span>
-                              <span>{prompt.text}</span>
-                            </button>
-                          ))}
-                        </div>
+                          </div>
+                        )}
+                        <div ref={messagesEndRef} />
                       </div>
                     )}
+                  </div>
 
-                    {/* Message Input */}
-                    <div className="p-4 space-y-3 flex-1 flex flex-col justify-end">
-                      {/* Clear Conversation Button */}
-                      {messages.length > 0 && (
-                        <div className="flex justify-center">
+                  {/* Quick Prompts */}
+                  {messages.length === 0 && (
+                    <div className="p-4 flex-shrink-0 border-t border-gray-200/50">
+                      <p className="text-sm font-medium text-gray-600 mb-3">Quick prompts:</p>
+                      <div className="space-y-2">
+                        {quickPrompts.map((prompt, index) => (
                           <button
-                            onClick={clearConversation}
-                            className="px-3 py-1.5 text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-lg transition-all duration-200 flex items-center gap-1"
+                            key={index}
+                            onClick={() => handleQuickPrompt(prompt.text)}
+                            className="w-full text-left text-sm px-3 py-2 rounded-xl bg-gray-50/80 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 flex items-center gap-2 hover:scale-105"
                           >
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                            Clear chat
+                            <span>{prompt.icon}</span>
+                            <span>{prompt.text}</span>
                           </button>
-                        </div>
-                      )}
-                      
-                      <textarea
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        className="w-full p-3 bg-gray-50/50 border-2 border-gray-200/50 rounded-xl focus:border-blue-400 focus:bg-white outline-none transition-all duration-200 resize-none text-gray-800 placeholder-gray-500"
-                        placeholder="What's on your mind?"
-                        rows={3}
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            handleSend();
-                          }
-                        }}
-                      />
-                      <div className="flex gap-2">
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Message Input */}
+                  <div className="p-4 space-y-3 flex-1 flex flex-col justify-end">
+                    {/* Clear Conversation Button */}
+                    {messages.length > 0 && (
+                      <div className="flex justify-center">
                         <button
-                          onClick={handleSend}
-                          disabled={!message.trim() || isLoading}
-                          className="flex-1 py-2.5 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-medium hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 hover:scale-105 active:scale-95"
+                          onClick={clearConversation}
+                          className="px-3 py-1.5 text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-lg transition-all duration-200 flex items-center gap-1"
                         >
-                          {isLoading ? (
-                            <>
-                              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                              Thinking...
-                            </>
-                          ) : (
-                            <>
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                              </svg>
-                              Send
-                            </>
-                          )}
-                        </button>
-                        <button
-                          onClick={() => setMessage('')}
-                          className="py-2.5 px-4 bg-gray-100 text-gray-600 rounded-xl font-medium hover:bg-gray-200 transition-all duration-200"
-                        >
-                          Clear
+                          <Trash2 className="w-3 h-3" />
+                          Clear chat
                         </button>
                       </div>
-                      <p className="text-xs text-gray-500 text-center">
-                        Shift+Enter for new line
-                      </p>
+                    )}
+                    
+                    <textarea
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      className="w-full p-3 bg-gray-50/50 border-2 border-gray-200/50 rounded-xl focus:border-blue-400 focus:bg-white outline-none transition-all duration-200 resize-none text-gray-800 placeholder-gray-500"
+                      placeholder="What's on your mind?"
+                      rows={3}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSend();
+                        }
+                      }}
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleSend}
+                        disabled={!message.trim() || isLoading}
+                        className="flex-1 py-2.5 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-medium hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 hover:scale-105 active:scale-95"
+                      >
+                        {isLoading ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                            Thinking...
+                          </>
+                        ) : (
+                          <>
+                            <SendHorizonal className="w-4 h-4" />
+                            Send
+                          </>
+                        )}
+                      </button>
+                      <button
+                        onClick={() => setMessage('')}
+                        className="py-2.5 px-4 bg-gray-100 text-gray-600 rounded-xl font-medium hover:bg-gray-200 transition-all duration-200"
+                      >
+                        Clear
+                      </button>
                     </div>
-                  </>
-                )}
-
-                {/* Minimized state - show restore button */}
-                {isMinimized && (
-                  <div className="flex-1 flex items-center justify-center">
-                    <button
-                      onClick={restore}
-                      className="text-blue-600 hover:text-blue-700 font-medium"
-                    >
-                      Click to restore
-                    </button>
+                    <p className="text-xs text-gray-500 text-center">
+                      Shift+Enter for new line
+                    </p>
                   </div>
-                )}
+                </>
               </div>
             </div>
           )}

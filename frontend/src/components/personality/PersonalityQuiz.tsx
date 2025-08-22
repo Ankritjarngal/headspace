@@ -4,56 +4,135 @@ import { useAuth } from '../../contexts/AuthContext';
 const personalities = {
   'aura_calm': {
     name: 'Aura',
-    description: 'Calm, encouraging, and gentle companion',
+    description: 'A calm, encouraging, and gentle companion, ideal for finding peace and serenity.',
     icon: '🌸',
     color: 'gradient-primary'
   },
   'zenith_mindful': {
     name: 'Zenith', 
-    description: 'Mindfulness and presence focused',
+    description: 'A focused guide for mindfulness and presence, helping you stay grounded in the moment.',
     icon: '🧘',
     color: 'gradient-secondary'
   },
   'summit_proactive': {
     name: 'Summit',
-    description: 'Proactive and goal-oriented motivator', 
+    description: 'A proactive and goal-oriented motivator, perfect for achieving your aspirations and milestones.', 
     icon: '⚡',
     color: 'gradient-accent'
   },
-  'default': {
-    name: 'Companion',
-    description: 'Supportive and caring AI friend',
-    icon: '💙',
+  'luna_empathic': {
+    name: 'Luna',
+    description: 'An empathetic and supportive friend, prioritizing emotional connection and understanding.',
+    icon: '🌙',
     color: 'gradient-calm'
+  },
+  'sage_introspective': {
+    name: 'Sage',
+    description: 'A wise and introspective guide, encouraging deep thought and personal insight.',
+    icon: '🦉',
+    color: 'gradient-tertiary'
   }
 };
 
 const questions = [
   {
-    question: "When facing stress, I prefer to:",
+    question: "When facing a new challenge, I am most likely to:",
     answers: [
-      { text: "Take deep breaths and find my center", personality: "zenith_mindful" },
-      { text: "Make a plan and take action immediately", personality: "summit_proactive" },
-      { text: "Talk through my feelings gently", personality: "aura_calm" },
-      { text: "Get support from others", personality: "default" }
+      { text: "Take a step back to breathe and center myself.", personality: "aura_calm" },
+      { text: "Analyze the problem and immediately create an action plan.", personality: "summit_proactive" },
+      { text: "Consider how this challenge makes me feel emotionally.", personality: "luna_empathic" },
+      { text: "Observe my thoughts and reactions without judgment.", personality: "zenith_mindful" },
+      { text: "Ponder the deeper meaning or lesson in the challenge.", personality: "sage_introspective" }
     ]
   },
   {
-    question: "My ideal way to start the day is:",
+    question: "My ideal way to de-stress is:",
     answers: [
-      { text: "Meditation or mindful breathing", personality: "zenith_mindful" },
-      { text: "Setting goals and making a to-do list", personality: "summit_proactive" },
-      { text: "Gentle affirmations and self-care", personality: "aura_calm" },
-      { text: "Connecting with loved ones", personality: "default" }
+      { text: "Engaging in a mindful activity like cooking or gardening.", personality: "zenith_mindful" },
+      { text: "Making a list of small, achievable tasks to regain a sense of control.", personality: "summit_proactive" },
+      { text: "Practicing gentle yoga or meditation to relax my body and mind.", personality: "aura_calm" },
+      { text: "Talking to a close friend or family member about my feelings.", personality: "luna_empathic" },
+      { text: "Reflecting on what truly matters to me and putting things in perspective.", personality: "sage_introspective" }
     ]
   },
   {
-    question: "When helping others, I tend to:",
+    question: "When helping a friend, I tend to:",
     answers: [
-      { text: "Guide them to be present and aware", personality: "zenith_mindful" },
-      { text: "Help them create actionable solutions", personality: "summit_proactive" },
-      { text: "Offer comfort and encouragement", personality: "aura_calm" },
-      { text: "Listen and provide emotional support", personality: "default" }
+      { text: "Listen attentively and validate their emotions.", personality: "luna_empathic" },
+      { text: "Break down their problem and offer practical solutions.", personality: "summit_proactive" },
+      { text: "Provide a calming presence and reassure them it will be okay.", personality: "aura_calm" },
+      { text: "Encourage them to focus on the present moment.", personality: "zenith_mindful" },
+      { text: "Ask thought-provoking questions to help them find their own answers.", personality: "sage_introspective" }
+    ]
+  },
+  {
+    question: "My personal growth is most motivated by:",
+    answers: [
+      { text: "The desire to feel more centered and at peace.", personality: "aura_calm" },
+      { text: "Setting and achieving ambitious personal goals.", personality: "summit_proactive" },
+      { text: "Understanding my own emotions and those of others.", personality: "luna_empathic" },
+      { text: "Cultivating a deeper sense of awareness in my daily life.", personality: "zenith_mindful" },
+      { text: "Gaining new insights and expanding my knowledge.", personality: "sage_introspective" }
+    ]
+  },
+  {
+    question: "In my daily routine, I prioritize:",
+    answers: [
+      { text: "Making time for quiet reflection or meditation.", personality: "zenith_mindful" },
+      { text: "Checking off items on my to-do list.", personality: "summit_proactive" },
+      { text: "Connecting with loved ones and community.", personality: "luna_empathic" },
+      { text: "Moments of gentle self-care and relaxation.", personality: "aura_calm" },
+      { text: "Reading or learning something new to stimulate my mind.", personality: "sage_introspective" }
+    ]
+  },
+  {
+    question: "I feel most aligned with myself when:",
+    answers: [
+      { text: "I'm in a state of calm and clarity.", personality: "aura_calm" },
+      { text: "I'm making tangible progress toward a goal.", personality: "summit_proactive" },
+      { text: "I'm feeling understood and emotionally connected.", personality: "luna_empathic" },
+      { text: "I'm fully present in the moment, appreciating my surroundings.", personality: "zenith_mindful" },
+      { text: "I've had a breakthrough in my thinking or perspective.", personality: "sage_introspective" }
+    ]
+  },
+  {
+    question: "My preferred communication style is:",
+    answers: [
+      { text: "Soft-spoken and reassuring.", personality: "aura_calm" },
+      { text: "Direct, concise, and solution-focused.", personality: "summit_proactive" },
+      { text: "Warm and encouraging, with an emphasis on feelings.", personality: "luna_empathic" },
+      { text: "Thoughtful and deliberate, focused on the deeper meaning.", personality: "sage_introspective" },
+      { text: "Clear and simple, focusing on one thing at a time.", personality: "zenith_mindful" }
+    ]
+  },
+  {
+    question: "When I feel overwhelmed, I'm most likely to:",
+    answers: [
+      { text: "Take a break to find a sense of inner quiet.", personality: "aura_calm" },
+      { text: "Make a list to break down the problem into smaller parts.", personality: "summit_proactive" },
+      { text: "Share my feelings with someone I trust.", personality: "luna_empathic" },
+      { text: "Do a quick breathing exercise to regain my focus.", personality: "zenith_mindful" },
+      { text: "Try to understand the root cause of my feelings.", personality: "sage_introspective" }
+    ]
+  },
+  {
+    question: "I see my journey as:",
+    answers: [
+      { text: "A peaceful path of self-discovery.", personality: "aura_calm" },
+      { text: "A series of opportunities to grow and achieve.", personality: "summit_proactive" },
+      { text: "A shared experience of connection and understanding.", personality: "luna_empathic" },
+      { text: "An unfolding process of being present.", personality: "zenith_mindful" },
+      { text: "A quest for deeper knowledge and wisdom.", personality: "sage_introspective" }
+    ]
+  },
+  {
+    question: "The most important part of a good support system is:",
+    answers: [
+      { text: "A calm and non-judgmental atmosphere.", personality: "aura_calm" },
+      { text: "Actionable advice and helpful feedback.", personality: "summit_proactive" },
+      { text: "Emotional validation and compassion.", personality: "luna_empathic" },
+      { text: "A gentle reminder to stay centered.", personality: "zenith_mindful" },
+      { text: "The opportunity for meaningful conversations.", personality: "sage_introspective" }
     ]
   }
 ];
@@ -76,7 +155,6 @@ const PersonalityQuiz: React.FC<PersonalityQuizProps> = ({ onComplete }) => {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
-      // Calculate most common personality type
       const counts = newAnswers.reduce((acc, type) => {
         acc[type] = (acc[type] || 0) + 1;
         return acc;
@@ -97,7 +175,7 @@ const PersonalityQuiz: React.FC<PersonalityQuizProps> = ({ onComplete }) => {
   };
 
   const skipQuiz = () => {
-    setPersonality('default');
+    setPersonality('aura_calm'); 
     onComplete();
   };
 

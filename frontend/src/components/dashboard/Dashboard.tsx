@@ -26,7 +26,9 @@ const Dashboard: React.FC = () => {
     'aura_calm': { name: 'Aura', icon: '🌸', greeting: 'Welcome back, dear soul' },
     'zenith_mindful': { name: 'Zenith', icon: '🧘', greeting: 'Find your center today' },
     'summit_proactive': { name: 'Summit', icon: '⚡', greeting: 'Ready to conquer your goals?' },
-    'default': { name: 'Companion', icon: '💙', greeting: 'How are you feeling today?' }
+    'luna_empathic': { name: 'Luna', icon: '🌙', greeting: 'How are you feeling today?' },
+    'sage_introspective': { name: 'Sage', icon: '🦉', greeting: 'Let\'s find some wisdom together' },
+    'default': { name: 'Companion', icon: '💙', greeting: 'How can I help you today?' }
   };
 
   const companion = personalityInfo[user?.personality as keyof typeof personalityInfo] || personalityInfo.default;
@@ -134,7 +136,7 @@ const Dashboard: React.FC = () => {
                   <span className="text-lg sm:text-xl">{companion.icon}</span>
                 </div>
                 <div className="min-w-0">
-                  <h1 className="text-lg sm:text-xl font-bold truncate">MindSpace</h1>
+                  <h1 className="text-lg sm:text-xl font-bold truncate">HeadSpace</h1>
                   <p className="text-xs sm:text-sm text-muted-foreground truncate hidden sm:block">
                     {companion.greeting}
                   </p>

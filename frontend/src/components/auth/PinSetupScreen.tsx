@@ -151,8 +151,8 @@ const PinSetupScreen: React.FC<PinSetupScreenProps> = ({ onSuccess }) => {
             <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
               <Shield className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold mb-2 gradient-calm bg-clip-text text-transparent">
-              Welcome to MindSpace
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2 bg-clip-text">
+              Welcome to HeadSpace
             </h1>
             <p className="text-muted-foreground text-sm mb-4 sm:mb-6">
               Your personal self-help companion

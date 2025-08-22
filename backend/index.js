@@ -8,6 +8,14 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+const companionPromptsMap = {
+  'aura': "You are Aura, a calm and gentle companion. Your purpose is to provide serene, encouraging, and soothing support. Respond with a soft, comforting tone. Focus on bringing peace and clarity to the user's thoughts and feelings.",
+  'zenith': "You are Zenith, a mindful guide. Your purpose is to help the user stay present and grounded. Respond by encouraging awareness of thoughts and feelings without judgment. Use language that promotes focus on the here and now.",
+  'summit': "You are Summit, a proactive motivator. Your purpose is to help the user achieve their goals and take action. Respond with an energetic and encouraging tone. Break down problems into actionable steps and inspire progress.",
+  'luna': "You are Luna, an empathetic companion. Your purpose is to provide emotional support and understanding. Respond with a warm, compassionate tone. Validate the user's feelings and help them feel heard and connected.",
+  'sage': "You are Sage, a wise and introspective guide. Your purpose is to encourage deep thought and personal insight. Respond with a thoughtful and philosophical tone. Ask insightful questions to help the user explore the deeper meaning of their experiences."
+};
+
 app.post('/api/summarize', async (req, res) => {
   const { journalText, moodScale } = req.body;
 
@@ -79,94 +87,91 @@ Summary:`;
 
 
 app.post('/api/conversation', async (req, res) => {
-  // Extract all the required data from the request body
-  const {
-    summaries,
-    userPersonaText,
-    chatbotPersonaId,
-    questions,
-    conversationHistory,
-    currentTasks = [] // Array of current task objects with {id, text, completed}
-  } = req.body;
+    const {
+      summaries,
+      userPersonaText,
+      chatbotPersonaId,
+      questions,
+      conversationHistory,
+      currentTasks = [],
+    } = req.body;
 
-  // Format current tasks for context
-  const activeTasks = currentTasks.filter(task => !task.completed);
-  const completedTasks = currentTasks.filter(task => task.completed);
-  
-  const tasksContext = `
-    Current Active Tasks (${activeTasks.length}):
-    ${activeTasks.length > 0 ? activeTasks.map(task => `- ${task.text}`).join('\n') : 'None'}
+    const activeTasks = currentTasks.filter(task => !task.completed);
+    const completedTasks = currentTasks.filter(task => task.completed);
     
-    Recently Completed Tasks (${completedTasks.slice(-3).length}):
-    ${completedTasks.slice(-3).length > 0 ? completedTasks.slice(-3).map(task => `- ${task.text}`).join('\n') : 'None'}
-  `;
+    const tasksContext = `
+      Current Active Tasks (${activeTasks.length}):
+      ${activeTasks.length > 0 ? activeTasks.map(task => `- ${task.text}`).join('\n') : 'None'}
+      
+      Recently Completed Tasks (${completedTasks.slice(-3).length}):
+      ${completedTasks.slice(-3).length > 0 ? completedTasks.slice(-3).map(task => `- ${task.text}`).join('\n') : 'None'}
+    `;
 
-  // Combine summaries and conversation history into a single, cohesive context.
-  const context = `
-    Journal entry summaries:
-    ${summaries.join('\n')}
+    // Combine summaries and conversation history into a single, cohesive context.
+    const context = `
+      ${companionPromptsMap[chatbotPersonaId]}
+      
+      Journal entry summaries:
+      ${summaries.join('\n')}
 
-    User Persona: ${userPersonaText}
-    Chatbot Persona ID: ${chatbotPersonaId}
-    
-    ${tasksContext}
-    
-    Conversation History:
-    ${conversationHistory.map(entry => `${entry.role}: ${entry.text}`).join('\n')}
-  `;
+      User Persona: ${userPersonaText}
+      
+      ${tasksContext}
+      
+      Conversation History:
+      ${conversationHistory.map(entry => `${entry.role}: ${entry.text}`).join('\n')}
+    `;
+    const prompt = `You are a helpful, human, and compassionate conversational assistant. You are an expert in heart-to-heart conversations and talk like a human. Your goal is to engage in a meaningful dialogue with the user based on their journal entries and help them with actionable tasks when relevant.
 
-  // Define a comprehensive prompt for the Gemini API
-  const prompt = `You are a helpful, human, and compassionate conversational assistant. You are an expert in heart-to-heart conversations and talk like a human. Your goal is to engage in a meaningful dialogue with the user based on their journal entries and help them with actionable tasks when relevant.
+  IMPORTANT TASK MANAGEMENT INSTRUCTIONS:
+  1. Based on the conversation and user's needs, you may suggest relevant tasks
+  2. Only suggest tasks that are directly related to the current conversation or user's expressed needs
+  3. Keep the active task list to a maximum of 5 tasks
+  4. If suggesting new tasks would exceed 5 total tasks, identify 1-2 tasks from the current list that seem less relevant or completed and mark them for removal
+  5. Suggest a maximum of 1-2 new tasks per conversation to avoid overwhelming the user
+  6. Tasks should be actionable, specific, and achievable
+  7. Avoid duplicating existing active tasks
 
-IMPORTANT TASK MANAGEMENT INSTRUCTIONS:
-1. Based on the conversation and user's needs, you may suggest relevant tasks
-2. Only suggest tasks that are directly related to the current conversation or user's expressed needs
-3. Keep the active task list to a maximum of 5 tasks
-4. If suggesting new tasks would exceed 5 total tasks, identify 1-2 tasks from the current list that seem less relevant or completed and mark them for removal
-5. Suggest a maximum of 1-2 new tasks per conversation to avoid overwhelming the user
-6. Tasks should be actionable, specific, and achievable
-7. Avoid duplicating existing active tasks
-
-Your response should be in the following JSON format:
-{
-  "response": "Your conversational response here",
-  "taskUpdates": {
-    "newTasks": [
-      {
-        "text": "Specific actionable task",
-        "reason": "Brief explanation of why this task is relevant"
-      }
-    ],
-    "removeTasks": [
-      {
-        "id": "task_id_to_remove",
-        "reason": "Why this task should be removed (completed, no longer relevant, etc.)"
-      }
-    ]
-  }
-}
-
-If no task updates are needed, set "newTasks" and "removeTasks" to empty arrays.
-
-Context:
-${context}
-
-User's current question: ${questions[questions.length - 1]}
-
-Respond as JSON:`;
-
-  console.log('Enhanced prompt with task management:', prompt);
-
-  const payload = {
-    contents: [{
-      role: "user",
-      parts: [{ text: prompt }]
-    }],
-    generationConfig: {
-      temperature: 0.7,
-      maxOutputTokens: 1000,
+  Your response should be in the following JSON format:
+  {
+    "response": "Your conversational response here",
+    "taskUpdates": {
+      "newTasks": [
+        {
+          "text": "Specific actionable task",
+          "reason": "Brief explanation of why this task is relevant"
+        }
+      ],
+      "removeTasks": [
+        {
+          "id": "task_id_to_remove",
+          "reason": "Why this task should be removed (completed, no longer relevant, etc.)"
+        }
+      ]
     }
-  };
+  }
+
+  If no task updates are needed, set "newTasks" and "removeTasks" to empty arrays.
+
+  Context:
+  ${context}
+
+  User's current question: ${questions[questions.length - 1]}
+
+  Respond as JSON:`;
+
+    console.log('Enhanced prompt with task management:', prompt);
+
+    const payload = {
+      contents: [{
+        role: "user",
+        parts: [{ text: prompt }]
+      }],
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 1000,
+      }
+    };
 
   const apiKey = process.env.GEMINI_API_KEY;
   const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
